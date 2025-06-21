@@ -1,27 +1,13 @@
 use crate::token;
 use crate::token::TokenType;
-use async_trait::async_trait;
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
-use mockall::predicate::*;
+use reqwest::Url;
 use reqwest::cookie::Jar;
 use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
-use reqwest::{Response, Url};
 use std::net::IpAddr;
 use std::sync::Arc;
 use std::{thread, time::Duration};
-
-#[async_trait]
-pub trait HttpClient: Send + Sync {
-    async fn get(&self, url: &str, headers: HeaderMap) -> reqwest::Result<Response>;
-}
-
-#[async_trait]
-impl HttpClient for reqwest::Client {
-    async fn get(&self, url: &str, headers: HeaderMap) -> reqwest::Result<Response> {
-        self.get(url).headers(headers).send().await
-    }
-}
 
 pub struct Worker {
     key: String,
@@ -32,7 +18,7 @@ pub struct Worker {
     host: Url,
     cookie_domain: Option<String>,
     max_iterations: u32,
-    http_client: Box<dyn HttpClient>,
+    http_client: reqwest::Client,
     sleep: u64,
 }
 
@@ -53,7 +39,7 @@ impl Worker {
         let cookie_domain = Self::extract_cookie_domain(&host);
 
         let runner = Self {
-            http_client: Box::new(reqwest::Client::new()), // temporary, will be replaced
+            http_client: reqwest::Client::new(), // temporary, will be replaced
             url: String::from(url),
             token_type: token_type.clone(),
             key: String::from(key),
@@ -77,7 +63,7 @@ impl Worker {
             token_type: token_type,
             cookie_domain: cookie_domain,
             max_iterations: max_iterations,
-            http_client: Box::new(client),
+            http_client: client,
             sleep,
         }
     }
@@ -89,7 +75,12 @@ impl Worker {
             let token_header = HeaderValue::from_str(&self.encoded_token().unwrap())?;
             headers.insert("CTA-Common-Access-Token", token_header);
         }
-        let result = self.http_client.get(&self.url, headers.clone()).await?;
+        let result = self
+            .http_client
+            .get(&self.url)
+            .headers(headers.clone())
+            .send()
+            .await?;
         let body = result.text().await?;
         let stream_segment = find_line_after_pattern(&body, "EXTINF").unwrap();
         // Handle that the segments can be a full url or a path segment
@@ -100,7 +91,12 @@ impl Worker {
         };
 
         for i in 1..self.max_iterations + 1 {
-            let res = self.http_client.get(&stream_url, headers.clone()).await?;
+            let res = self
+                .http_client
+                .get(&stream_url)
+                .headers(headers.clone())
+                .send()
+                .await?;
             if self.token_type == TokenType::Header {
                 match res.headers().get("cta-common-access-token") {
                     Some(token) => {
