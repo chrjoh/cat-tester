@@ -7,7 +7,7 @@ edition = "2024"
 async-trait = "0.1.88"
 base64 = "0.22.1"
 clap = { version = "4.5.40", features = ["derive"] }
-common-access-token = { git = "ssh://git@github.com/chrjoh/common-access-token.git" }
+common-access-token = { git = "https://github.com/chrjoh/common-access-token.git" }
 hex = "0.4.3"
 hmac = "0.12.1"
 httpmock = { version = "0.7.0" }

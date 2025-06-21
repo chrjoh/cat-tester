@@ -465,7 +465,7 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 [[package]]
 name = "common-access-token"
 version = "0.2.2"
-source = "git+ssh://git@github.com/chrjoh/common-access-token.git#49300c4577a9f1c2a04bd6b058f87d36b511de74"
+source = "git+https://github.com/chrjoh/common-access-token.git#49300c4577a9f1c2a04bd6b058f87d36b511de74"
 dependencies = [
  "base64 0.22.1",
  "hex",
