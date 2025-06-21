@@ -48,10 +48,6 @@ impl Worker {
     ) -> Self {
         let u = url.parse::<Url>().unwrap();
         let scheme = u.scheme();
-        match u.host_str() {
-            Some(val) => eprintln!("host: {:}", val),
-            None => eprintln!("failed to get host"),
-        }
         let host = u.host_str().unwrap_or("localhost");
         let cookie_host = format!("{}://{}", scheme, host).parse::<Url>().unwrap();
         let cookie_domain = Self::extract_cookie_domain(&host);
