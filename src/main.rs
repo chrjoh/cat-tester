@@ -22,7 +22,7 @@ struct Args {
     token_type: token::TokenType,
 
     /// m3u8 url that return streaming segments
-    #[arg(short, long, default_value_t=String::from("https://cattest.streaming.a2d.tv/asset/20465722.isml/20465722-video=2499968.m3u8"))]
+    #[arg(short, long)]
     url: String,
 
     /// token issuer to use
