@@ -18,7 +18,9 @@ struct Args {
     ttl: u64,
 
     /// Select what type of token
-    #[arg(value_enum,short,long,default_value_t = token::TokenType::Cookie)]
+    /// CookieAsQuery is needed as a fix for airply to work with initial token
+    /// as query and moved into cooke to be handled by the playing device
+    #[arg(value_enum,short,long,default_value_t = token::TokenType::Header)]
     token_type: token::TokenType,
 
     /// m3u8 url that return streaming segments

@@ -71,13 +71,18 @@ impl Worker {
     pub async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {
         let mut headers = HeaderMap::new();
         headers.insert(USER_AGENT, HeaderValue::from_static("reqwest"));
+        let mut manifest_url = self.url.clone();
         if self.token_type == TokenType::Header {
             let token_header = HeaderValue::from_str(&self.encoded_token().unwrap())?;
             headers.insert("CTA-Common-Access-Token", token_header);
+        } else if self.token_type == TokenType::CookieAsQuery {
+            let params = [("CAT", &self.encoded_token().unwrap())];
+            let parsed_url = reqwest::Url::parse_with_params(&manifest_url, &params)?;
+            manifest_url = parsed_url.to_string();
         }
         let result = self
             .http_client
-            .get(&self.url)
+            .get(&manifest_url)
             .headers(headers.clone())
             .send()
             .await?;
@@ -143,6 +148,13 @@ impl Worker {
                 );
                 let cookie_store = Arc::new(Jar::default());
                 cookie_store.add_cookie_str(&cookie_str, &self.host);
+                reqwest::Client::builder()
+                    .cookie_provider(cookie_store)
+                    .build()
+            }
+            TokenType::CookieAsQuery => {
+                // create empty cookie jar
+                let cookie_store = Arc::new(Jar::default());
                 reqwest::Client::builder()
                     .cookie_provider(cookie_store)
                     .build()
@@ -272,6 +284,57 @@ mod test {
             1,
             0,
         );
+        let result = runner.run().await;
+        if result.is_err() {
+            eprintln!("error {:?}", result);
+        }
+        assert!(result.is_ok());
+
+        playlist_mock.assert();
+        segment_mock.assert();
+    }
+
+    #[tokio::test]
+    async fn test_run_with_cat_in_query_retuned_as_cookie() {
+        let server = MockServer::start();
+
+        // Mock the playlist response
+        let body = "#EXTM3U\n#EXTINF:10,\nsegment.ts";
+        let playlist_mock = server.mock(|when, then| {
+            when.method(GET)
+                .path("/playlist.m3u8")
+                .query_param_exists("CAT");
+            then.status(200)
+                .header("content-length", body.len().to_string())
+                .header(
+                    "Set-Cookie",
+                    "CTA-Common-Access-Token=abc123; Path=/; HttpOnly",
+                )
+                .body(body);
+        });
+
+        // Mock the segment response
+        let body = "segment content";
+        let segment_mock = server.mock(|when, then| {
+            when.method(GET)
+                .path("/segment.ts")
+                .cookie_exists("CTA-Common-Access-Token");
+            then.status(200)
+                .header("content-length", body.len().to_string())
+                .body(body);
+        });
+        let key_hex = "403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388"; // "testKey" in hex
+        let base_url = server.base_url();
+        let runner = Worker::new(
+            key_hex,
+            &format!("{}/playlist.m3u8", base_url),
+            3600,
+            TokenType::CookieAsQuery,
+            "issuer",
+            1,
+            0,
+        );
+
         let result = runner.run().await;
         if result.is_err() {
             eprintln!("error {:?}", result);

@@ -9,6 +9,9 @@ use std::collections::BTreeMap;
 pub enum TokenType {
     Header,
     Cookie,
+    /// This is needed as a fix for airply to work with initial token
+    /// as query and moved into cooke to be handled by the playing device
+    CookieAsQuery,
 }
 fn decode_string(s: &str) -> Vec<u8> {
     let result = Vec::from_hex(s);
@@ -20,7 +23,7 @@ fn decode_string(s: &str) -> Vec<u8> {
 
 fn catr(variant: &TokenType, time: u64, ttl: u64, domain: &str) -> BTreeMap<i32, CborValue> {
     match variant {
-        TokenType::Cookie => {
+        TokenType::Cookie | TokenType::CookieAsQuery => {
             let cookie_domain = format!("Domain={}", domain);
             catr::cookie_renewal(
                 ttl as i64,

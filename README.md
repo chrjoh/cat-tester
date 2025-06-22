@@ -3,7 +3,7 @@
 ## Overview
 
 A tool in rust that test Common-Access-Token(CAT) implementation for fetching streaming data from a remote server.
-I wrote this program as exercise while learning rust, so it may contain issues that I'm not aware of. As I need some extra features I had to modify the common-access-token crate and the modified version can be found at https://github.com/chrjoh/common-access-token
+I wrote this program as exercise while learning rust, so it may contain issues that I'm not aware of. As I need some extra features I had to modify the common-access-token crate and the modified version can be found at https://github.com/chrjoh/common-access-token. There is an extra fix to handle airplay explained bellow.
 
 ## Usage
 
@@ -18,6 +18,9 @@ the segments under EXTiNF can be of both full url or a path. The code will for e
 
 Fetch manifest from https://example.com/asset/5245.isml/5245-video=2499968.m3u8 and rewrite the url to
 https://example.com/asset/5245.isml/hls/5245-video=5000000-455767831.m4s to fetch the same segment(the first found in the manifest file) max_iteration times with a sleep for four seconds(default time, can be changed) for each fetch.
+
+To handle the case with airplay the airplay url is constructed by adding CAT token, with cookie refresh as a query
+parameter named CAT. This extra fix need to be handled serverside to move the query value into a set-cookie in the response.
 
 ### Manifest format
 
