@@ -35,18 +35,18 @@ impl Worker {
         let u = url.parse::<Url>().unwrap();
         let scheme = u.scheme();
         let host = u.host_str().unwrap_or("localhost");
-        let cookie_host = format!("{}://{}", scheme, host).parse::<Url>().unwrap();
         let cookie_domain = Self::extract_cookie_domain(&host);
+        let host = format!("{}://{}", scheme, host).parse::<Url>().unwrap();
 
         let runner = Self {
             http_client: reqwest::Client::new(), // temporary, will be replaced
             url: String::from(url),
-            token_type: token_type.clone(),
+            token_type,
             key: String::from(key),
             ttl,
-            cookie_domain: cookie_domain.clone(),
+            cookie_domain,
             issuer: String::from(issuer),
-            host: cookie_host.clone(),
+            host,
             max_iterations,
             sleep,
         };
@@ -55,16 +55,8 @@ impl Worker {
             .expect("Failed to create HTTP client");
 
         Self {
-            key: String::from(key),
-            url: String::from(url),
-            issuer: String::from(issuer),
-            ttl: ttl,
-            host: cookie_host,
-            token_type: token_type,
-            cookie_domain: cookie_domain,
-            max_iterations: max_iterations,
             http_client: client,
-            sleep,
+            ..runner
         }
     }
 
