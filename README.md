@@ -26,7 +26,7 @@ parameter named CAT. This extra fix need to be handled serverside to move the qu
 
 This program accepts several command-line arguments to configure its behavior. Below is a list of all available options, their descriptions, and default values.
 
-## 🧾 Arguments
+## Arguments
 
 ### `--key`, `-k`
 
