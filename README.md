@@ -22,6 +22,73 @@ https://example.com/asset/5245.isml/hls/5245-video=5000000-455767831.m4s to fetc
 To handle the case with airplay the airplay url is constructed by adding CAT token, with cookie refresh as a query
 parameter named CAT. This extra fix need to be handled serverside to move the query value into a set-cookie in the response.
 
+# Program Options Documentation
+
+This program accepts several command-line arguments to configure its behavior. Below is a list of all available options, their descriptions, and default values.
+
+## 🧾 Arguments
+
+### `--key`, `-k`
+
+**Description**: Key to use for token generation.
+**Default**:
+`403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388`
+**Note**: This default key works with the online checker [https://cta-token.net/](https://cta-token*Description\*\*: Expiry time to add during renewal. The token expiry is set to `ttl * 2`.
+**Type**: `u64`**Default**:`20`
+
+---
+
+### `--token-type`, `-t`
+
+**Description**: Select the type of token to use.
+**Type**: Enum `TokenType`
+**Options**:
+
+- `Cookie` (default)
+- `CookieAsQuery` — used as a workaround for Airplay, where the token starts as a query and is moved into a cookie for device compatibility.
+
+---
+
+### `--url`, `-u`
+
+**Description**: The m3u8 URL that returns streaming segments.
+**Type**: `String`
+**Default**:
+`https://cattest.streaming.example.com/asset/12345.isml/123456-video=2499968.m3u8`
+
+---
+
+### `--issuer`, `-i`
+
+**Description**: Token issuer to use.
+**Type**: `String`
+**Default**: `eyevinn`
+
+---
+
+### `--max-iterations`, `-m`
+
+**Description**: Number of times to fetch the stream segment.
+**Type**: `u32`
+**Default**: `5`
+
+---
+
+### `--sleep`
+
+**Description**: Time in milliseconds to sleep between fetching stream segments.
+**Type**: `u64`
+**Default**: `4000`
+
+---
+
+## Example Usage
+
+```bash
+cargo run -- --key YOUR_KEY --ttl 30 --token-type CookieAsQuery --url https://yourstream.com/stream.m3u8 --issuer myissuer --max-iterations 10 --sleep 5000
+
+```
+
 ### Manifest format
 
 ```
