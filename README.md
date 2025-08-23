@@ -41,7 +41,9 @@ This program accepts several command-line arguments to configure its behavior. B
 
 **Description**: Expire to add to the created token
 
-**Default**: u64 `20`
+**Type** u64
+
+**Default**: `20`
 
 ---
 
