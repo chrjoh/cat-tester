@@ -31,8 +31,10 @@ This program accepts several command-line arguments to configure its behavior. B
 ### `--key`, `-k`
 
 **Description**: Key to use for token generation.
+
 **Default**:
 `403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388`
+
 **Note**: This default key works with the online checker [https://cta-token.net/](https://cta-token.net)
 
 ---
