@@ -35,19 +35,26 @@ This program accepts several command-line arguments to configure its behavior. B
 `403697de87af64611c1d32a05dab0fe1fcb715a86ab435f1ec99192d79569388`
 **Note**: This default key works with the online checker [https://cta-token.net/](https://cta-token.net)
 
-**Type**: `u64`
+---
 
-**Default**:`20`
+### `--ttl`, `-t`
+
+**Description**: Expire to add to the created token
+
+**Default**: u64 `20`
 
 ---
 
 ### `--token-type`, `-t`
 
 **Description**: Select the type of token to use.
+
 **Type**: Enum `TokenType`
+
 **Options**:
 
 - `Cookie` (default)
+- `Header` — use the token in the header
 - `CookieAsQuery` — used as a workaround for Airplay, where the token starts as a query and is moved into a cookie for device compatibility.
 
 ---
@@ -55,7 +62,9 @@ This program accepts several command-line arguments to configure its behavior. B
 ### `--url`, `-u`
 
 **Description**: The m3u8 URL that returns streaming segments.
+
 **Type**: `String`
+
 **Default**:
 `https://cattest.streaming.example.com/asset/12345.isml/123456-video=2499968.m3u8`
 
@@ -64,7 +73,9 @@ This program accepts several command-line arguments to configure its behavior. B
 ### `--issuer`, `-i`
 
 **Description**: Token issuer to use.
+
 **Type**: `String`
+
 **Default**: `eyevinn`
 
 ---
@@ -72,7 +83,9 @@ This program accepts several command-line arguments to configure its behavior. B
 ### `--max-iterations`, `-m`
 
 **Description**: Number of times to fetch the stream segment.
+
 **Type**: `u32`
+
 **Default**: `5`
 
 ---
@@ -80,7 +93,9 @@ This program accepts several command-line arguments to configure its behavior. B
 ### `--sleep`
 
 **Description**: Time in milliseconds to sleep between fetching stream segments.
+
 **Type**: `u64`
+
 **Default**: `4000`
 
 ---
